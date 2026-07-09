@@ -5,6 +5,7 @@ import { Login } from './pages/Login'
 import { Register } from './pages/Register'
 import { Onboarding } from './pages/Onboarding'
 import { JoinFamily } from './pages/JoinFamily'
+import { GoogleCallback } from './pages/GoogleCallback'
 import { Dashboard } from './pages/Dashboard'
 import { Profile } from './pages/Profile'
 import { Family } from './pages/Family'
@@ -18,9 +19,10 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         {/* Public */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/join" element={<JoinFamily />} />
+        <Route path="/login"         element={<Login />} />
+        <Route path="/register"      element={<Register />} />
+        <Route path="/join"          element={<JoinFamily />} />
+        <Route path="/auth/callback" element={<GoogleCallback />} />
 
         {/* Protected — full-screen (no sidebar layout) */}
         <Route
@@ -41,17 +43,17 @@ export default function App() {
           }
         >
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/family" element={<Family />} />
-          <Route path="/weight" element={<WeightTracking />} />
-          <Route path="/workouts" element={<WorkoutTracking />} />
-          <Route path="/meals" element={<MealTracking />} />
-          <Route path="/water" element={<WaterTracking />} />
+          <Route path="/profile"   element={<Profile />} />
+          <Route path="/family"    element={<Family />} />
+          <Route path="/weight"    element={<WeightTracking />} />
+          <Route path="/workouts"  element={<WorkoutTracking />} />
+          <Route path="/meals"     element={<MealTracking />} />
+          <Route path="/water"     element={<WaterTracking />} />
         </Route>
 
         {/* Redirect root */}
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/"  element={<Navigate to="/dashboard" replace />} />
+        <Route path="*"  element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>
   )

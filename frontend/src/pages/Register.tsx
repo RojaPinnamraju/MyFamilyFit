@@ -4,6 +4,7 @@ import { Dumbbell, Eye, EyeOff } from 'lucide-react'
 import { authApi } from '../api/auth'
 import { useAuthStore } from '../store/authStore'
 import { LoadingSpinner } from '../components/LoadingSpinner'
+import { GoogleButton } from '../components/GoogleButton'
 
 export function Register() {
   const navigate = useNavigate()
@@ -28,7 +29,6 @@ export function Register() {
     try {
       const res = await authApi.register({ name: form.name, email: form.email, password: form.password })
       setAuth(res.user, res.access_token)
-      // Send new users through onboarding to create/join a family
       navigate('/onboarding')
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Registration failed. Please try again.')
@@ -50,6 +50,16 @@ export function Register() {
 
         <div className="card shadow-xl">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Create account</h2>
+
+          {/* Google sign-up */}
+          <GoogleButton label="Sign up with Google" />
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 my-5">
+            <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+            <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">or</span>
+            <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+          </div>
 
           {error && (
             <div className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm">

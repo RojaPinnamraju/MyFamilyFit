@@ -24,9 +24,13 @@ services:
       SECRET_KEY: ${SECRET_KEY:-supersecretkey-change-in-production-use-256-bit-random-string}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-10080}
       DEBUG: ${DEBUG:-false}
-      # Public URL used inside invite links (change for production)
+      # Public URL used in invite emails and OAuth redirects
       APP_URL: ${APP_URL:-http://localhost:5173}
-      # SMTP — leave blank to disable email; invite link will show in UI instead
+      # Google OAuth 2.0 — leave blank to disable the Google button
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-http://localhost:8000/api/v1/auth/google/callback}
+      # SMTP — leave blank to disable email; invite link shows in UI instead
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_USERNAME: ${SMTP_USERNAME:-}

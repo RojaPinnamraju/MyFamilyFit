@@ -37,6 +37,11 @@ class User(Base):
     daily_water_goal_ml = Column(Integer, default=2500)
     avatar_color = Column(String, default="#6366f1")
 
+    # OAuth
+    google_id     = Column(String, unique=True, nullable=True, index=True)
+    avatar_url    = Column(String, nullable=True)   # Google profile picture URL
+    auth_provider = Column(String, default="local", nullable=False)  # "local" | "google"
+
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

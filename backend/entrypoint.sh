@@ -22,7 +22,7 @@ except Exception as e:
 done
 echo "PostgreSQL is ready"
 
-echo "Creating / verifying schema..."
+echo "Creating / verifying base schema..."
 python -c "
 from app.database import Base, engine
 import app.models  # registers all models
@@ -30,8 +30,9 @@ Base.metadata.create_all(bind=engine)
 print('Schema OK')
 "
 
-echo "Stamping alembic..."
-alembic stamp head 2>/dev/null || true
+# Run migrations (idempotent — migration 002 checks column existence before adding)
+echo "Running Alembic migrations..."
+alembic upgrade head
 
 echo "Starting FamilyFit API..."
 exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload

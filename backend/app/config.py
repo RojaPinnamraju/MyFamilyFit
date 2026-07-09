@@ -24,6 +24,12 @@ class Settings(BaseSettings):
     SMTP_FROM: str = ""
     SMTP_TLS: bool = True                   # Use STARTTLS (port 587). Set False for SSL (port 465).
 
+    # Google OAuth 2.0 — leave blank to disable "Continue with Google"
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+    # Must match exactly what you registered in Google Cloud Console
+    GOOGLE_REDIRECT_URI: str = "http://localhost:8000/api/v1/auth/google/callback"
+
     class Config:
         env_file = ".env"
         extra = "allow"
@@ -31,6 +37,10 @@ class Settings(BaseSettings):
     @property
     def smtp_configured(self) -> bool:
         return bool(self.SMTP_HOST and self.SMTP_USERNAME and self.SMTP_PASSWORD and self.SMTP_FROM)
+
+    @property
+    def google_oauth_configured(self) -> bool:
+        return bool(self.GOOGLE_CLIENT_ID and self.GOOGLE_CLIENT_SECRET)
 
 
 settings = Settings()

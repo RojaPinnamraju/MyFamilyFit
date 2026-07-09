@@ -44,6 +44,8 @@ class UserResponse(BaseModel):
     daily_calorie_goal: int
     daily_water_goal_ml: int
     avatar_color: str
+    avatar_url: Optional[str] = None       # Google profile picture
+    auth_provider: str = "local"           # "local" | "google"
     created_at: datetime
 
     class Config:

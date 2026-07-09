@@ -17,6 +17,8 @@ export interface User {
   daily_calorie_goal: number
   daily_water_goal_ml: number
   avatar_color: string
+  avatar_url?: string        // Google profile picture
+  auth_provider: string      // "local" | "google"
   created_at: string
 }
 
