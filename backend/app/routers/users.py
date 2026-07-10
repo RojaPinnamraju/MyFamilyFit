@@ -10,6 +10,10 @@ from app.models.workout import WorkoutEntry
 from app.models.meal import MealEntry
 from app.models.water import WaterEntry
 from app.schemas.user import UserResponse, UserProfileUpdate
+from pydantic import BaseModel
+
+class PushTokenUpdate(BaseModel):
+    push_token: str
 from app.core.deps import get_current_user
 
 router = APIRouter(prefix="/users", tags=["Users"])
@@ -28,6 +32,18 @@ def update_profile(
 ):
     for field, value in update_data.model_dump(exclude_unset=True).items():
         setattr(current_user, field, value)
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
+
+@router.patch("/me/push-token", response_model=UserResponse)
+def update_push_token(
+    data: PushTokenUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    current_user.push_token = data.push_token
     db.commit()
     db.refresh(current_user)
     return current_user

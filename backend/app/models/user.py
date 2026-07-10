@@ -42,6 +42,9 @@ class User(Base):
     avatar_url    = Column(String, nullable=True)   # Google profile picture URL
     auth_provider = Column(String, default="local", nullable=False)  # "local" | "google"
 
+    # Push notifications
+    push_token    = Column(String, nullable=True)   # Expo push token
+
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
