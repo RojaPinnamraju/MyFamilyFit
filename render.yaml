@@ -2,8 +2,7 @@ services:
   - type: web
     name: familyfit-backend
     runtime: docker
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
+    dockerfilePath: ./Dockerfile
     plan: free
     envVars:
       - key: DATABASE_URL
