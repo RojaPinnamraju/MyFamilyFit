@@ -13,6 +13,8 @@ import { WeightTracking } from './pages/WeightTracking'
 import { WorkoutTracking } from './pages/WorkoutTracking'
 import { MealTracking } from './pages/MealTracking'
 import { WaterTracking } from './pages/WaterTracking'
+import { NutritionPage } from './pages/NutritionPage'
+import { MedicationsPage } from './pages/MedicationsPage'
 
 export default function App() {
   return (
@@ -48,7 +50,9 @@ export default function App() {
           <Route path="/weight"    element={<WeightTracking />} />
           <Route path="/workouts"  element={<WorkoutTracking />} />
           <Route path="/meals"     element={<MealTracking />} />
-          <Route path="/water"     element={<WaterTracking />} />
+          <Route path="/water"       element={<WaterTracking />} />
+          <Route path="/nutrition"   element={<NutritionPage />} />
+          <Route path="/medications" element={<MedicationsPage />} />
         </Route>
 
         {/* Redirect root */}

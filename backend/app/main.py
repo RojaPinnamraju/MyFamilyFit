@@ -1,15 +1,27 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.config   import settings
-from app.database import Base, engine
-from app.routers  import auth, users, families, weights, workouts, meals, water, invitations, invites
+from app.config    import settings
+from app.database  import Base, engine
+from app.routers   import auth, users, families, weights, workouts, meals, water, invitations, invites, medications
+from app.scheduler import start_scheduler, stop_scheduler
 
 import app.models  # noqa: registers all models with SQLAlchemy
 
 Base.metadata.create_all(bind=engine)
 
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    start_scheduler()
+    yield
+    stop_scheduler()
+
+
 app = FastAPI(
+    lifespan=lifespan,
     title=settings.APP_NAME,
     description="Family fitness and meal tracking API",
     version="2.0.0",
@@ -39,6 +51,7 @@ app.include_router(weights.router,     prefix=PREFIX)
 app.include_router(workouts.router,    prefix=PREFIX)
 app.include_router(meals.router,       prefix=PREFIX)
 app.include_router(water.router,       prefix=PREFIX)
+app.include_router(medications.router, prefix=PREFIX)
 
 
 @app.get("/")

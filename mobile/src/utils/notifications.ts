@@ -93,3 +93,71 @@ export async function scheduleWorkoutReminder(hour = 7, minute = 0) {
 export async function cancelAllReminders() {
   await Notifications.cancelAllScheduledNotificationsAsync()
 }
+
+// ── Medication reminders ──────────────────────────────────────────────────────
+export interface MedScheduleItem {
+  id: number
+  name: string
+  dosage?: string
+  reminder_times: string[]   // ["08:00", "20:00"]
+  food_timing?: string
+}
+
+const MED_REMINDER_TAG = 'med_reminder'
+
+/** Cancel all previously scheduled med reminders and reschedule from scratch. */
+export async function scheduleMedReminders(meds: MedScheduleItem[]): Promise<void> {
+  // Cancel existing med notifications (by tag prefix)
+  const scheduled = await Notifications.getAllScheduledNotificationsAsync()
+  for (const notif of scheduled) {
+    if ((notif.content.data as any)?.tag === MED_REMINDER_TAG) {
+      await Notifications.cancelScheduledNotificationAsync(notif.identifier)
+    }
+  }
+
+  const { status } = await Notifications.getPermissionsAsync()
+  if (status !== 'granted') return
+
+  for (const med of meds) {
+    for (const timeStr of med.reminder_times) {
+      const [hourStr, minuteStr] = timeStr.split(':')
+      const hour   = parseInt(hourStr,   10)
+      const minute = parseInt(minuteStr, 10)
+
+      if (isNaN(hour) || isNaN(minute)) continue
+
+      const foodHint: Record<string, string> = {
+        before: 'Before food',
+        after:  'After food',
+        with:   'With food',
+      }
+      const bodyParts = [med.dosage, foodHint[med.food_timing ?? '']].filter(Boolean)
+
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: `💊 ${med.name}`,
+          body:  bodyParts.join(' · ') || 'Time for your medication',
+          sound: true,
+          data:  { tag: MED_REMINDER_TAG, medication_id: med.id, reminder_time: timeStr },
+        },
+        trigger: {
+          hour,
+          minute,
+          repeats: true,
+        } as Notifications.DailyTriggerInput,
+      })
+    }
+  }
+}
+
+/** Send an immediate local notification (for testing). */
+export async function sendImmediateMedReminder(name: string, dosage?: string): Promise<void> {
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: `💊 ${name} (test)`,
+      body:  dosage || 'Test reminder',
+      sound: true,
+    },
+    trigger: null,   // fire immediately
+  })
+}

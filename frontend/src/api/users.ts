@@ -9,6 +9,7 @@ export interface ProfileUpdate {
   current_weight_kg?: number
   target_weight_kg?: number
   goal_type?: string
+  activity_level?: string
   daily_calorie_goal?: number
   daily_water_goal_ml?: number
   avatar_color?: string

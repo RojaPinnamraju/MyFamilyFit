@@ -1,5 +1,8 @@
 export type GoalType = 'lose_weight' | 'gain_muscle' | 'maintain'
 export type Gender = 'male' | 'female' | 'other'
+export type ActivityLevel = 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active'
+export type FoodTiming = 'before' | 'after' | 'with' | 'any'
+export type MedLogStatus = 'taken' | 'skipped'
 export type FamilyRole = 'admin' | 'member'
 export type ExerciseCategory = 'strength' | 'cardio' | 'flexibility' | 'sports' | 'other'
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack'
@@ -14,6 +17,7 @@ export interface User {
   current_weight_kg?: number
   target_weight_kg?: number
   goal_type?: GoalType
+  activity_level?: ActivityLevel
   daily_calorie_goal: number
   daily_water_goal_ml: number
   avatar_color: string
@@ -130,4 +134,73 @@ export interface FamilyActivity {
   user_color: string
   description: string
   timestamp: string
+}
+
+// ── Nutrition ─────────────────────────────────────────────────────────────────
+export interface MacroTargets {
+  protein_g: number
+  carbs_g: number
+  fat_g: number
+  protein_pct: number
+  carbs_pct: number
+  fat_pct: number
+}
+
+export interface MealTarget {
+  calories: number
+  protein_g: number
+  carbs_g: number
+  fat_g: number
+}
+
+export interface NutritionTargets {
+  bmr: number
+  tdee: number
+  target_calories: number
+  goal_type: string
+  activity_level: ActivityLevel
+  macros: MacroTargets
+  meal_targets: {
+    breakfast: MealTarget
+    lunch: MealTarget
+    dinner: MealTarget
+    snack: MealTarget
+  }
+}
+
+// ── Medications ───────────────────────────────────────────────────────────────
+export interface Medication {
+  id: number
+  user_id: number
+  name: string
+  dosage?: string
+  frequency: string
+  reminder_times: string[]
+  food_timing: FoodTiming
+  notes?: string
+  start_date?: string
+  end_date?: string
+  is_active: boolean
+  created_at: string
+}
+
+export interface MedicationLog {
+  id: number
+  medication_id: number
+  user_id: number
+  log_date: string
+  reminder_time?: string
+  status: MedLogStatus
+  notes?: string
+  logged_at: string
+}
+
+export interface TodayMedItem {
+  medication_id: number
+  name: string
+  dosage?: string
+  reminder_time: string
+  food_timing: FoodTiming
+  log_id?: number
+  status?: MedLogStatus
 }

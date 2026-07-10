@@ -4,15 +4,17 @@ set -e
 echo "Waiting for PostgreSQL..."
 until python -c "
 import psycopg2, os
+from urllib.parse import urlparse
 url = os.environ.get('DATABASE_URL', 'postgresql://familyfit:familyfit@db:5432/familyfit')
-parts = url.replace('postgresql://', '').split('/')
-db = parts[1]
-userhost = parts[0].split('@')
-user_pass = userhost[0].split(':')
-host_port = userhost[1].split(':')
+r = urlparse(url)
+ssl = 'require' if r.hostname and 'neon.tech' in r.hostname else 'prefer'
 try:
-    conn = psycopg2.connect(dbname=db, user=user_pass[0], password=user_pass[1],
-                             host=host_port[0], port=host_port[1])
+    conn = psycopg2.connect(
+        dbname=r.path.lstrip('/').split('?')[0],
+        user=r.username, password=r.password,
+        host=r.hostname, port=r.port or 5432,
+        sslmode=ssl,
+    )
     conn.close()
 except Exception as e:
     print(f'Waiting... {e}')
@@ -35,4 +37,4 @@ echo "Running Alembic migrations..."
 alembic upgrade head
 
 echo "Starting FamilyFit API..."
-exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+exec uvicorn app.main:app --host 0.0.0.0 --port 8000

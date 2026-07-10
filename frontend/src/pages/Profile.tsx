@@ -16,6 +16,14 @@ const GENDER_OPTIONS = [
   { value: 'other', label: 'Other' },
 ]
 
+const ACTIVITY_OPTIONS = [
+  { value: 'sedentary',   label: 'Sedentary (little or no exercise)' },
+  { value: 'light',       label: 'Lightly active (1–3 days/week)' },
+  { value: 'moderate',    label: 'Moderately active (3–5 days/week)' },
+  { value: 'active',      label: 'Very active (6–7 days/week)' },
+  { value: 'very_active', label: 'Extra active (athlete / physical job)' },
+]
+
 const AVATAR_COLORS = [
   '#6366f1', '#ec4899', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6',
   '#ef4444', '#14b8a6', '#f97316', '#06b6d4',
@@ -35,6 +43,7 @@ export function Profile() {
     current_weight_kg: user?.current_weight_kg?.toString() || '',
     target_weight_kg: user?.target_weight_kg?.toString() || '',
     goal_type: user?.goal_type || '',
+    activity_level: user?.activity_level || 'moderate',
     daily_calorie_goal: user?.daily_calorie_goal?.toString() || '2000',
     daily_water_goal_ml: user?.daily_water_goal_ml?.toString() || '2500',
     avatar_color: user?.avatar_color || '#6366f1',
@@ -55,6 +64,7 @@ export function Profile() {
       if (form.current_weight_kg) payload.current_weight_kg = parseFloat(form.current_weight_kg)
       if (form.target_weight_kg) payload.target_weight_kg = parseFloat(form.target_weight_kg)
       if (form.goal_type) payload.goal_type = form.goal_type
+      if (form.activity_level) payload.activity_level = form.activity_level
       if (form.daily_calorie_goal) payload.daily_calorie_goal = parseInt(form.daily_calorie_goal)
       if (form.daily_water_goal_ml) payload.daily_water_goal_ml = parseInt(form.daily_water_goal_ml)
 
@@ -152,6 +162,13 @@ export function Profile() {
                 <option value="">Select your goal</option>
                 {GOAL_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
+            </div>
+            <div className="sm:col-span-2">
+              <label className="label">Activity Level</label>
+              <select className="input" value={form.activity_level} onChange={e => update('activity_level', e.target.value)}>
+                {ACTIVITY_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Used to calculate your TDEE and nutrition targets</p>
             </div>
           </div>
         </div>

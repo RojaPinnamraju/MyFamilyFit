@@ -4,17 +4,86 @@ from typing import List
 from datetime import datetime, date, timedelta
 
 from app.database import get_db
-from app.models.user import User
+from app.models.user import User, ActivityLevel, Gender, GoalType
 from app.models.weight import WeightEntry
 from app.models.workout import WorkoutEntry
 from app.models.meal import MealEntry
 from app.models.water import WaterEntry
 from app.schemas.user import UserResponse, UserProfileUpdate
+from app.core.deps import get_current_user
 from pydantic import BaseModel
 
 class PushTokenUpdate(BaseModel):
     push_token: str
-from app.core.deps import get_current_user
+
+
+# ── Nutrition helpers ─────────────────────────────────────────────────────────
+ACTIVITY_MULTIPLIERS = {
+    ActivityLevel.SEDENTARY:   1.2,
+    ActivityLevel.LIGHT:       1.375,
+    ActivityLevel.MODERATE:    1.55,
+    ActivityLevel.ACTIVE:      1.725,
+    ActivityLevel.VERY_ACTIVE: 1.9,
+}
+
+def _calculate_nutrition(user: User) -> dict:
+    """Mifflin-St Jeor BMR → TDEE → macro targets."""
+    w = user.current_weight_kg or 70.0
+    h = user.height_cm or 170.0
+    a = user.age or 30
+
+    if user.gender == Gender.MALE:
+        bmr = 10 * w + 6.25 * h - 5 * a + 5
+    elif user.gender == Gender.FEMALE:
+        bmr = 10 * w + 6.25 * h - 5 * a - 161
+    else:
+        bmr = 10 * w + 6.25 * h - 5 * a - 78  # average
+
+    mult = ACTIVITY_MULTIPLIERS.get(user.activity_level or ActivityLevel.MODERATE, 1.55)
+    tdee = bmr * mult
+
+    goal = user.goal_type or GoalType.MAINTAIN
+    if goal == GoalType.LOSE_WEIGHT:
+        target_cal = max(1200, tdee - 500)
+        p_pct, c_pct, f_pct = 0.35, 0.40, 0.25
+    elif goal == GoalType.GAIN_MUSCLE:
+        target_cal = tdee + 300
+        p_pct, c_pct, f_pct = 0.30, 0.50, 0.20
+    else:  # maintain
+        target_cal = tdee
+        p_pct, c_pct, f_pct = 0.25, 0.50, 0.25
+
+    cal = round(target_cal)
+    protein_g = round((cal * p_pct) / 4)
+    carbs_g   = round((cal * c_pct) / 4)
+    fat_g     = round((cal * f_pct) / 9)
+
+    meal_split = {"breakfast": 0.25, "lunch": 0.35, "dinner": 0.30, "snack": 0.10}
+
+    return {
+        "bmr": round(bmr),
+        "tdee": round(tdee),
+        "target_calories": cal,
+        "goal_type": goal,
+        "activity_level": user.activity_level or ActivityLevel.MODERATE,
+        "macros": {
+            "protein_g": protein_g,
+            "carbs_g": carbs_g,
+            "fat_g": fat_g,
+            "protein_pct": round(p_pct * 100),
+            "carbs_pct": round(c_pct * 100),
+            "fat_pct": round(f_pct * 100),
+        },
+        "meal_targets": {
+            meal: {
+                "calories": round(cal * pct),
+                "protein_g": round(protein_g * pct),
+                "carbs_g": round(carbs_g * pct),
+                "fat_g": round(fat_g * pct),
+            }
+            for meal, pct in meal_split.items()
+        },
+    }
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -35,6 +104,11 @@ def update_profile(
     db.commit()
     db.refresh(current_user)
     return current_user
+
+
+@router.get("/me/nutrition")
+def get_nutrition_targets(current_user: User = Depends(get_current_user)):
+    return _calculate_nutrition(current_user)
 
 
 @router.patch("/me/push-token", response_model=UserResponse)

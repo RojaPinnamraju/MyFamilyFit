@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, Enum, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, Float, Enum, DateTime, Boolean, JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 import enum
@@ -18,6 +18,14 @@ class Gender(str, enum.Enum):
     OTHER = "other"
 
 
+class ActivityLevel(str, enum.Enum):
+    SEDENTARY     = "sedentary"       # little/no exercise
+    LIGHT         = "light"           # 1-3 days/week
+    MODERATE      = "moderate"        # 3-5 days/week
+    ACTIVE        = "active"          # 6-7 days/week
+    VERY_ACTIVE   = "very_active"     # hard daily exercise / physical job
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -33,6 +41,7 @@ class User(Base):
     current_weight_kg = Column(Float, nullable=True)
     target_weight_kg = Column(Float, nullable=True)
     goal_type = Column(Enum(GoalType), nullable=True)
+    activity_level = Column(Enum(ActivityLevel), nullable=True, default=ActivityLevel.MODERATE)
     daily_calorie_goal = Column(Integer, default=2000)
     daily_water_goal_ml = Column(Integer, default=2500)
     avatar_color = Column(String, default="#6366f1")
@@ -51,6 +60,7 @@ class User(Base):
 
     # Relationships
     family_memberships = relationship("FamilyMember", back_populates="user")
+    medications = relationship("Medication", back_populates="user", cascade="all, delete-orphan")
     weight_entries = relationship("WeightEntry", back_populates="user", cascade="all, delete-orphan")
     workout_entries = relationship("WorkoutEntry", back_populates="user", cascade="all, delete-orphan")
     meal_entries = relationship("MealEntry", back_populates="user", cascade="all, delete-orphan")

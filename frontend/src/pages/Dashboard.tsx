@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Scale, Flame, Droplets, Dumbbell, Target, Zap, TrendingUp, Users } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Scale, Flame, Droplets, Dumbbell, Target, Zap, TrendingUp, Users, Apple, Pill, Check, X, Clock } from 'lucide-react'
 import { usersApi } from '../api/users'
 import { familiesApi } from '../api/families'
+import { nutritionApi } from '../api/nutrition'
+import { medicationsApi } from '../api/medications'
 import { useAuthStore } from '../store/authStore'
-import type { Dashboard as DashboardData, FamilyActivity } from '../types'
+import type { Dashboard as DashboardData, FamilyActivity, NutritionTargets, TodayMedItem } from '../types'
 import { StatCard } from '../components/StatCard'
 import { PageLoader } from '../components/LoadingSpinner'
 import { formatDistanceToNow } from 'date-fns'
@@ -12,17 +15,38 @@ export function Dashboard() {
   const { user } = useAuthStore()
   const [data, setData] = useState<DashboardData | null>(null)
   const [activity, setActivity] = useState<FamilyActivity[]>([])
+  const [nutrition, setNutrition] = useState<NutritionTargets | null>(null)
+  const [meds, setMeds] = useState<TodayMedItem[]>([])
+  const [logging, setLogging] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+
+  const loadMeds = () => medicationsApi.getToday().then(setMeds).catch(() => {})
 
   useEffect(() => {
     Promise.all([
       usersApi.getDashboard(),
       familiesApi.getActivity().catch(() => []),
-    ]).then(([dash, act]) => {
+      nutritionApi.getTargets().catch(() => null),
+      medicationsApi.getToday().catch(() => []),
+    ]).then(([dash, act, nut, m]) => {
       setData(dash)
       setActivity(act)
+      setNutrition(nut)
+      setMeds(m as TodayMedItem[])
     }).finally(() => setLoading(false))
   }, [])
+
+  const handleLog = async (item: TodayMedItem, status: 'taken' | 'skipped') => {
+    const key = `${item.medication_id}-${item.reminder_time}`
+    setLogging(key)
+    try {
+      const today = new Date().toISOString().slice(0, 10)
+      await medicationsApi.log(item.medication_id, status, item.reminder_time, today)
+      await loadMeds()
+    } finally {
+      setLogging(null)
+    }
+  }
 
   if (loading) return <PageLoader />
 
@@ -144,6 +168,115 @@ export function Dashboard() {
             : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'}
         />
       </div>
+
+      {/* Nutrition summary card */}
+      {nutrition && (
+        <div className="card">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <Apple className="w-5 h-5 text-emerald-500" />
+              Today's Nutrition Targets
+            </h3>
+            <Link to="/nutrition" className="text-xs text-primary-600 dark:text-primary-400 hover:underline">Details →</Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+            {[
+              { label: 'Calories', value: `${nutrition.target_calories} kcal`, color: 'text-orange-600 dark:text-orange-400' },
+              { label: 'Protein', value: `${nutrition.macros.protein_g}g`, color: 'text-green-600 dark:text-green-400' },
+              { label: 'Carbs', value: `${nutrition.macros.carbs_g}g`, color: 'text-amber-600 dark:text-amber-400' },
+              { label: 'Fat', value: `${nutrition.macros.fat_g}g`, color: 'text-rose-500 dark:text-rose-400' },
+            ].map(s => (
+              <div key={s.label} className="text-center p-2 rounded-xl bg-gray-50 dark:bg-gray-800/60">
+                <p className={`text-lg font-bold ${s.color}`}>{s.value}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{s.label}</p>
+              </div>
+            ))}
+          </div>
+          {/* Macro bars */}
+          <div className="space-y-2">
+            {[
+              { label: 'Protein', pct: nutrition.macros.protein_pct, color: 'bg-green-500' },
+              { label: 'Carbs', pct: nutrition.macros.carbs_pct, color: 'bg-amber-400' },
+              { label: 'Fat', pct: nutrition.macros.fat_pct, color: 'bg-rose-400' },
+            ].map(m => (
+              <div key={m.label} className="flex items-center gap-2 text-xs">
+                <span className="w-14 text-gray-500 dark:text-gray-400">{m.label}</span>
+                <div className="flex-1 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                  <div className={`h-full rounded-full ${m.color}`} style={{ width: `${m.pct}%` }} />
+                </div>
+                <span className="w-8 text-right text-gray-500 dark:text-gray-400">{m.pct}%</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Today's medications card */}
+      {meds.length > 0 && (
+        <div className="card">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <Pill className="w-5 h-5 text-violet-500" />
+              Today's Medications
+              {meds.filter(m => !m.status).length > 0 && (
+                <span className="text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full">
+                  {meds.filter(m => !m.status).length} pending
+                </span>
+              )}
+            </h3>
+            <Link to="/medications" className="text-xs text-primary-600 dark:text-primary-400 hover:underline">Manage →</Link>
+          </div>
+          <div className="space-y-2">
+            {meds.map(item => {
+              const key = `${item.medication_id}-${item.reminder_time}`
+              return (
+                <div
+                  key={key}
+                  className={`flex items-center gap-3 p-3 rounded-xl border ${
+                    item.status === 'taken'   ? 'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-800' :
+                    item.status === 'skipped' ? 'bg-red-50 dark:bg-red-900/10 border-red-100 dark:border-red-800' :
+                    'bg-gray-50 dark:bg-gray-800/60 border-gray-100 dark:border-gray-700'
+                  }`}
+                >
+                  <Clock className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{item.name}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{item.reminder_time}{item.dosage ? ` · ${item.dosage}` : ''}</p>
+                  </div>
+                  {item.status ? (
+                    <span className={`text-xs font-medium px-2 py-1 rounded-full ${
+                      item.status === 'taken'
+                        ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
+                        : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+                    }`}>
+                      {item.status === 'taken' ? '✓ Taken' : '✗ Skipped'}
+                    </span>
+                  ) : (
+                    <div className="flex gap-1.5">
+                      <button
+                        onClick={() => handleLog(item, 'taken')}
+                        disabled={!!logging}
+                        className="p-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors disabled:opacity-50"
+                        title="Mark taken"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleLog(item, 'skipped')}
+                        disabled={!!logging}
+                        className="p-1.5 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 transition-colors disabled:opacity-50"
+                        title="Skip"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Family activity */}
       <div className="card">

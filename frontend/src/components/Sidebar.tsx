@@ -1,18 +1,20 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Users, Scale, Dumbbell,
-  Utensils, Droplets, User, LogOut, X
+  Utensils, Droplets, User, LogOut, X, Apple, Pill
 } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 
 const navItems = [
-  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/family', icon: Users, label: 'Family' },
-  { to: '/weight', icon: Scale, label: 'Weight' },
-  { to: '/workouts', icon: Dumbbell, label: 'Workouts' },
-  { to: '/meals', icon: Utensils, label: 'Meals' },
-  { to: '/water', icon: Droplets, label: 'Water' },
-  { to: '/profile', icon: User, label: 'Profile' },
+  { to: '/dashboard',   icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/family',      icon: Users,           label: 'Family' },
+  { to: '/weight',      icon: Scale,           label: 'Weight' },
+  { to: '/workouts',    icon: Dumbbell,        label: 'Workouts' },
+  { to: '/meals',       icon: Utensils,        label: 'Meals' },
+  { to: '/water',       icon: Droplets,        label: 'Water' },
+  { to: '/nutrition',   icon: Apple,           label: 'Nutrition' },
+  { to: '/medications', icon: Pill,            label: 'Medications' },
+  { to: '/profile',     icon: User,            label: 'Profile' },
 ]
 
 interface SidebarProps {
