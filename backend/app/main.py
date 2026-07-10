@@ -29,13 +29,16 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+_origins = list({
+    "http://localhost:5173",
+    "http://localhost:3000",
+    settings.APP_URL,
+    *[o.strip() for o in settings.EXTRA_CORS_ORIGINS.split(",") if o.strip()],
+})
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:3000",
-        settings.APP_URL,
-    ],
+    allow_origins=_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

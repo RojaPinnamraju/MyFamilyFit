@@ -24,6 +24,12 @@ class Settings(BaseSettings):
     SMTP_FROM: str = ""
     SMTP_TLS: bool = True                   # Use STARTTLS (port 587). Set False for SSL (port 465).
 
+    # Extra CORS origins (comma-separated) — add your Vercel URL here after deploying
+    EXTRA_CORS_ORIGINS: str = ""
+
+    # Timezone for medication reminders
+    TIMEZONE: str = "America/Los_Angeles"
+
     # Google OAuth 2.0 — leave blank to disable "Continue with Google"
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
