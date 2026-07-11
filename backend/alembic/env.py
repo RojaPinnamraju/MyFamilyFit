@@ -1,5 +1,5 @@
 from logging.config import fileConfig
-from sqlalchemy import engine_from_config, pool
+from sqlalchemy import engine_from_config, pool, text
 from alembic import context
 import sys
 import os
@@ -10,6 +10,11 @@ from app.database import Base
 from app.models import *  # noqa: ensure all models are imported
 
 config = context.config
+
+# Override sqlalchemy.url with DATABASE_URL env var if set
+db_url = os.environ.get("DATABASE_URL")
+if db_url:
+    config.set_main_option("sqlalchemy.url", db_url)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
