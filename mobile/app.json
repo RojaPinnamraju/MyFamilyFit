@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "FamilyFit",
+    "name": "MyFamilyFit",
     "slug": "familyfit",
     "version": "1.0.0",
     "sdkVersion": "54.0.0",
@@ -41,6 +41,17 @@
     "newArchEnabled": false,
     "experiments": {
       "typedRoutes": true
+    },
+    "updates": {
+      "url": "https://u.expo.dev/YOUR_EAS_PROJECT_ID"
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "YOUR_EAS_PROJECT_ID"
+      }
     }
   }
 }

@@ -1,6 +1,6 @@
 {
-  "name": "FamilyFit",
-  "short_name": "FamilyFit",
+  "name": "MyFamilyFit",
+  "short_name": "MyFamilyFit",
   "description": "Track Together, Thrive Together",
   "start_url": "/",
   "display": "standalone",

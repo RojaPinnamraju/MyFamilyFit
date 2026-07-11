@@ -35,7 +35,7 @@ class BaseEmailService(ABC):
         expires_at:  datetime | None = None,
         message:     str | None = None,
     ) -> bool:
-        subject = f"{invited_by} invited you to join {family_name} on FamilyFit"
+        subject = f"{invited_by} invited you to join {family_name} on MyFamilyFit"
 
         # Human-readable expiry
         if expires_at:
@@ -74,7 +74,7 @@ class BaseEmailService(ABC):
         <!-- Header -->
         <tr><td style="background:#6366f1;padding:32px;text-align:center">
           <h1 style="color:#ffffff;margin:0;font-size:28px;font-weight:700;
-                     letter-spacing:-0.5px">FamilyFit</h1>
+                     letter-spacing:-0.5px">MyFamilyFit</h1>
           <p style="color:#c7d2fe;margin:8px 0 0;font-size:14px">
             Track together, thrive together
           </p>
@@ -138,7 +138,7 @@ class BaseEmailService(ABC):
           <p style="color:#9ca3af;font-size:12px;margin:0;line-height:1.6">
             If you didn&rsquo;t expect this invitation, you can safely ignore
             this email &mdash; no account will be created.<br/>
-            &copy; FamilyFit
+            &copy; MyFamilyFit
           </p>
         </td></tr>
 
@@ -149,7 +149,7 @@ class BaseEmailService(ABC):
 </html>"""
 
         text = (
-            f"{invited_by} has invited you to join {family_name} on FamilyFit.\n\n"
+            f"{invited_by} has invited you to join {family_name} on MyFamilyFit.\n\n"
             f"Accept your invitation here:\n{invite_url}\n\n"
             f"This link expires on {exp_str}.\n\n"
             "If you didn't expect this email, ignore it — no account will be created."

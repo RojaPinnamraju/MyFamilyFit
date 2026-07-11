@@ -107,7 +107,7 @@ export function JoinFamily() {
                           rounded-2xl bg-primary-600 shadow-lg mb-4">
             <Dumbbell className="w-7 h-7 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">FamilyFit</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">MyFamilyFit</h1>
         </div>
 
         {/* ── Loading ── */}

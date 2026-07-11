@@ -44,7 +44,7 @@ export function Register() {
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary-600 shadow-lg mb-4">
             <Dumbbell className="w-7 h-7 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">FamilyFit</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">MyFamilyFit</h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1">Start your fitness journey</p>
         </div>
 

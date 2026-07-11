@@ -19,7 +19,7 @@ interface NavbarProps {
 export function Navbar({ onMenuClick }: NavbarProps) {
   const { isDark, toggle } = useThemeStore()
   const location = useLocation()
-  const title = PAGE_TITLES[location.pathname] || 'FamilyFit'
+  const title = PAGE_TITLES[location.pathname] || 'MyFamilyFit'
 
   return (
     <header className="h-16 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800

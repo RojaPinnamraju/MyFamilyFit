@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
 
     # App
-    APP_NAME: str = "FamilyFit"
+    APP_NAME: str = "MyFamilyFit"
     APP_URL: str = "http://localhost:5173"   # Used for invite links
     DEBUG: bool = False
 

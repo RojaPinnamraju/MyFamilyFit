@@ -83,7 +83,7 @@ function InviteModal({ onClose, onCreated }: InviteModalProps) {
                 <textarea
                   className="input resize-none"
                   rows={2}
-                  placeholder="Come join our family on FamilyFit!"
+                  placeholder="Come join our family on MyFamilyFit!"
                   value={message}
                   onChange={e => setMessage(e.target.value)}
                 />
