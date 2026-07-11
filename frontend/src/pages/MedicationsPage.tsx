@@ -28,7 +28,8 @@ function scheduleBrowserReminders(meds: Medication[]) {
       if (target <= now) continue                 // already past today
       const delay = target.getTime() - now.getTime()
       const timer = window.setTimeout(() => {
-        const body = [med.dosage, { before: 'Before food', after: 'After food', with: 'With food' }[med.food_timing] ?? '']
+        const foodMap: Record<string, string> = { before: 'Before food', after: 'After food', with: 'With food' }
+        const body = [med.dosage, foodMap[med.food_timing] ?? '']
           .filter(Boolean).join(' · ')
         new Notification(`💊 ${med.name}`, { body: body || 'Time for your medication', icon: '/favicon.ico' })
       }, delay)
